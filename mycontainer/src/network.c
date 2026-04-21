@@ -273,15 +273,15 @@ int network_init(void) {
     fflush(stdout);
     snprintf(cmd, sizeof(cmd),
              "ip link add %s type bridge 2>/dev/null", BRIDGE_NAME);
-    ret = system(cmd);
+    (void) system(cmd);
 
     snprintf(cmd, sizeof(cmd),
              "ip addr add %s dev %s 2>/dev/null", BRIDGE_CIDR, BRIDGE_NAME);
-    ret = system(cmd);
+    (void) system(cmd);
 
     snprintf(cmd, sizeof(cmd),
              "ip -6 addr add %s dev %s 2>/dev/null", BRIDGE_IPV6_CIDR, BRIDGE_NAME);
-    ret = system(cmd);
+    (void) system(cmd);
 
     snprintf(cmd, sizeof(cmd),
              "ip link set %s up 2>/dev/null", BRIDGE_NAME);
@@ -318,13 +318,13 @@ int network_init(void) {
     snprintf(cmd, sizeof(cmd),
              "iptables -t nat -A POSTROUTING -s %s -j MASQUERADE 2>/dev/null",
              BRIDGE_SUBNET);
-    ret = system(cmd);
+    (void) system(cmd);
 
     /* Allow forwarding on bridge */
     snprintf(cmd, sizeof(cmd),
              "iptables -A FORWARD -i %s -o %s -j ACCEPT 2>/dev/null",
              BRIDGE_NAME, BRIDGE_NAME);
-    ret = system(cmd);
+    (void) system(cmd);
     snprintf(cmd, sizeof(cmd),
              "ip6tables -A FORWARD -i %s -o %s -j ACCEPT 2>/dev/null",
              BRIDGE_NAME, BRIDGE_NAME);
@@ -654,23 +654,23 @@ int network_disconnect(const char *source_id, const char *target_id) {
         }
     }
 
-    /* Add iptables DROP rule between the two IPs */
+    /* Remove the ACCEPT rules that were added during connect */
     char cmd[MAX_CMD_LEN];
     snprintf(cmd, sizeof(cmd),
-             "iptables -A FORWARD -s %s -d %s -j DROP 2>/dev/null",
+             "iptables -D FORWARD -s %s -d %s -j ACCEPT 2>/dev/null",
              src->ip, tgt->ip);
     system(cmd);
     snprintf(cmd, sizeof(cmd),
-             "iptables -A FORWARD -s %s -d %s -j DROP 2>/dev/null",
+             "iptables -D FORWARD -s %s -d %s -j ACCEPT 2>/dev/null",
              tgt->ip, src->ip);
     system(cmd);
     if (strlen(src->ipv6) > 0 && strlen(tgt->ipv6) > 0) {
         snprintf(cmd, sizeof(cmd),
-                 "ip6tables -A FORWARD -s %s -d %s -j DROP 2>/dev/null",
+                 "ip6tables -D FORWARD -s %s -d %s -j ACCEPT 2>/dev/null",
                  src->ipv6, tgt->ipv6);
         system(cmd);
         snprintf(cmd, sizeof(cmd),
-                 "ip6tables -A FORWARD -s %s -d %s -j DROP 2>/dev/null",
+                 "ip6tables -D FORWARD -s %s -d %s -j ACCEPT 2>/dev/null",
                  tgt->ipv6, src->ipv6);
         system(cmd);
     }

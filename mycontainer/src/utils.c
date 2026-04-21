@@ -814,6 +814,12 @@ void str_trim(char *str) {
     char *start = str;
     while (isspace((unsigned char)*start)) start++;
 
+    /* If string is now empty, just terminate at str[0] */
+    if (*start == '\0') {
+        str[0] = '\0';
+        return;
+    }
+
     /* Trim trailing */
     char *end = start + strlen(start) - 1;
     while (end > start && isspace((unsigned char)*end)) end--;

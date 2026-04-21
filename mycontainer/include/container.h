@@ -14,11 +14,6 @@
 #define MAX_ENV_VARS    32
 #define MAX_VOLUMES     16
 
-typedef struct {
-    char *items[MAX_ENV_VARS];
-    int count;
-} EnvList;
-
 /*
  * Run a container with the given command.
  * Sets up namespaces, chroot, cgroups, then execve().
